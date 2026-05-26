@@ -30,7 +30,10 @@
 						assetsURI: "assets.epk",
 						localesURI: "lang/",
 						worldsDB: "worlds",
-						servers: [],
+						servers: [
+							{ addr: "wss://mc.voidsent.net/", name: "Voidsent" },
+							{ addr: "wss://krypticmc.net/", name: "KrypticMC" }
+						],
 						relays: [
 							{ addr: "wss://relay.deev.is/", comment: "lax1dude relay #1", primary: relayId == 0 },
 							{ addr: "wss://relay.lax1dude.net/", comment: "lax1dude relay #2", primary: relayId == 1 },
