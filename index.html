@@ -16,6 +16,103 @@
             justify-content: center;
             font-family: 'Segoe UI', sans-serif;
             color: white;
+            overflow: hidden;
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: #00f0ff;
+            border-radius: 50%;
+            animation: float linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes float {
+            0%   { transform: translateY(100vh) translateX(0px); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(40px); opacity: 0; }
+        }
+
+        /* 3D grid floor */
+        .grid-floor {
+            position: fixed;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 200%;
+            height: 400px;
+            background-image:
+                linear-gradient(rgba(0,240,255,0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,240,255,0.07) 1px, transparent 1px);
+            background-size: 60px 60px;
+            transform: translateX(-50%) perspective(400px) rotateX(75deg);
+            transform-origin: bottom center;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glow orbs in background */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            animation: orb-drift ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: #00f0ff;
+            top: -100px; left: -100px;
+            animation-duration: 8s;
+        }
+
+        .orb-2 {
+            width: 350px; height: 350px;
+            background: #a855f7;
+            bottom: -80px; right: -80px;
+            animation-duration: 10s;
+            animation-delay: -3s;
+        }
+
+        .orb-3 {
+            width: 250px; height: 250px;
+            background: #00f0ff;
+            top: 50%; left: 50%;
+            animation-duration: 12s;
+            animation-delay: -6s;
+        }
+
+        @keyframes orb-drift {
+            0%, 100% { transform: translate(0, 0); }
+            50%       { transform: translate(30px, -30px); }
+        }
+
+        /* Main content */
+        .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 3D title */
+        .title-wrap {
+            perspective: 600px;
+            margin-bottom: 8px;
         }
 
         h1 {
@@ -27,7 +124,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: shimmer 2s linear infinite;
-            margin-bottom: 8px;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        h1:hover {
+            transform: rotateX(15deg) scale(1.05);
+            text-shadow: 0 20px 40px rgba(0,240,255,0.4);
         }
 
         p {
@@ -38,11 +141,19 @@
             margin-bottom: 48px;
         }
 
+        /* 3D card container */
         .cards {
             display: flex;
             gap: 24px;
             flex-wrap: wrap;
             justify-content: center;
+            perspective: 1000px;
+        }
+
+        /* Card with full 3D tilt */
+        .card-wrap {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease;
         }
 
         .card {
@@ -55,15 +166,30 @@
             text-decoration: none;
             color: white;
             cursor: pointer;
-            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            display: block;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: #00f0ff;
-            box-shadow: 0 0 24px rgba(0, 240, 255, 0.15);
+        /* Shine layer on card */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.06), transparent 60%);
+            pointer-events: none;
+            transition: opacity 0.2s;
+            opacity: 0;
         }
 
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        /* Floating inner content */
         .card .version {
             font-size: 22px;
             font-weight: 700;
@@ -71,6 +197,9 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
+            transform: translateZ(20px);
+            display: block;
+            transition: transform 0.2s ease;
         }
 
         .card .label {
@@ -78,8 +207,40 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             color: #444;
+            transform: translateZ(10px);
+            display: block;
+            transition: transform 0.2s ease, color 0.2s ease;
         }
 
+        .card:hover .label {
+            color: #666;
+        }
+
+        /* Bottom glow line on hover */
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, #00f0ff, #a855f7);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 12px #00f0ff;
+        }
+
+        .card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            border-color: rgba(0,240,255,0.3);
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.5),
+                0 0 30px rgba(0,240,255,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        /* Credit */
         .credit {
             position: fixed;
             bottom: 18px;
@@ -87,6 +248,7 @@
             letter-spacing: 3px;
             text-transform: uppercase;
             color: #333;
+            z-index: 1;
         }
 
         .credit span {
@@ -98,31 +260,96 @@
 
         @keyframes shimmer {
             from { background-position: 0% center; }
-            to { background-position: 200% center; }
+            to   { background-position: 200% center; }
         }
     </style>
 </head>
 <body>
 
-    <h1>Select a Version</h1>
-    <p>Choose your experience</p>
+    <!-- Background layers -->
+    <div class="grid-floor"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
-    <div class="cards">
-        <a class="card" href="/1.8.8/">
-            <div class="version">1.8.8</div>
-            <div class="label">Multiplayer + Singleplayer</div>
-        </a>
-        <a class="card" href="/1.12.2/">
-            <div class="version">1.12.2</div>
-            <div class="label">Offline</div>
-        </a>
-        <a class="card" href="/1.9/">
-            <div class="version">1.9</div>
-            <div class="label">Offline</div>
-        </a>
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="title-wrap">
+            <h1>Select a Version</h1>
+        </div>
+        <p>Choose your experience</p>
+
+        <div class="cards" id="cards">
+            <div class="card-wrap">
+                <a class="card" href="/1.8.8/">
+                    <span class="version">1.8.8</span>
+                    <span class="label">Multiplayer + Singleplayer</span>
+                </a>
+            </div>
+            <div class="card-wrap">
+                <a class="card" href="/1.12.2/">
+                    <span class="version">1.12.2</span>
+                    <span class="label">Offline</span>
+                </a>
+            </div>
+            <div class="card-wrap">
+                <a class="card" href="/1.9/">
+                    <span class="version">1.9</span>
+                    <span class="label">Offline</span>
+                </a>
+            </div>
+        </div>
     </div>
 
     <div class="credit">Programmed by <span>DAME</span></div>
+
+    <script>
+        // Spawn floating particles
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 40; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = (6 + Math.random() * 10) + 's';
+            p.style.animationDelay = (-Math.random() * 16) + 's';
+            p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+            p.style.background = Math.random() > 0.5 ? '#00f0ff' : '#a855f7';
+            container.appendChild(p);
+        }
+
+        // 3D tilt effect on each card
+        document.querySelectorAll('.card-wrap').forEach(wrap => {
+            const card = wrap.querySelector('.card');
+
+            wrap.addEventListener('mousemove', e => {
+                const rect = wrap.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = (e.clientX - cx) / (rect.width / 2);
+                const dy = (e.clientY - cy) / (rect.height / 2);
+
+                wrap.style.transform = `rotateY(${dx * 15}deg) rotateX(${-dy * 15}deg) translateZ(10px)`;
+
+                // Move shine origin
+                const mx = ((e.clientX - rect.left) / rect.width) * 100;
+                const my = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mx', mx + '%');
+                card.style.setProperty('--my', my + '%');
+            });
+
+            wrap.addEventListener('mouseleave', () => {
+                wrap.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0px)';
+                wrap.style.transition = 'transform 0.5s ease';
+            });
+
+            wrap.addEventListener('mouseenter', () => {
+                wrap.style.transition = 'transform 0.1s ease';
+            });
+        });
+    </script>
 
 </body>
 </html>
